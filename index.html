@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QKD Key Manager - ETSI GS QKD 014 Simulator</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2360a5fa'><path d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>">
+    <style>
+        .lucide {
+            width: 1em;
+            height: 1em;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Lucide React Icons (simplified versions)
+        const Send = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+                <path d="M22 2 11 13"/>
+            </svg>
+        );
+
+        const Key = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <circle cx="7.5" cy="15.5" r="5.5"/>
+                <path d="m21 2-9.6 9.6"/>
+                <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+            </svg>
+        );
+
+        const Lock = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="m7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        );
+
+        const Unlock = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="m7 11V7a5 5 0 0 1 9.9-1"/>
+            </svg>
+        );
+
+        const Server = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
+                <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
+                <line x1="6" x2="6.01" y1="6" y2="6"/>
+                <line x1="6" x2="6.01" y1="18" y2="18"/>
+            </svg>
+        );
+
+        const Zap = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+            </svg>
+        );
+
+        const Shield = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+            </svg>
+        );
+
+        const Info = ({ className, size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m9 12 2 2 4-4"/>
+            </svg>
+        );
+
+        // Main QKD Component (same as before but with icon components defined above)
+        const QKDKeyManager = () => {
+          const [message, setMessage] = React.useState('');
+          const [encryptedMessage, setEncryptedMessage] = React.useState('');
+          const [decryptionKey, setDecryptionKey] = React.useState('');
+          const [decryptedMessage, setDecryptedMessage] = React.useState('');
+          const [keyId, setKeyId] = React.useState('');
+          const [apiLogs, setApiLogs] = React.useState([]);
+          const [qkdStatus, setQkdStatus] = React.useState('READY');
+          const [keyBuffer, setKeyBuffer] = React.useState([]);
+
+          // Simulate QKD key generation
+          React.useEffect(() => {
+            const interval = setInterval(() => {
+              const newKey = generateQuantumKey();
+              const newKeyId = `qkd_key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              
+              setKeyBuffer(prev => {
+                const updated = [...prev, { id: newKeyId, key: newKey, timestamp: Date.now() }];
+                return updated.slice(-10);
+              });
+            }, 2000);
+
+            return () => clearInterval(interval);
+          }, []);
+
+          const generateQuantumKey = () => {
+            const keyLength = 32;
+            const key = new Uint8Array(keyLength);
+            crypto.getRandomValues(key);
+            return Array.from(key).map(b => b.toString(16).padStart(2, '0')).join('');
+          };
+
+          const getKeys = async (keyCount = 1) => {
+            const log = {
+              timestamp: new Date().toISOString(),
+              method: 'GET',
+              endpoint: '/api/v1/keys',
+              params: { number: keyCount, size: 32 },
+              status: 'SUCCESS'
+            };
+            
+            setApiLogs(prev => [log, ...prev.slice(0, 9)]);
+            
+            if (keyBuffer.length === 0) {
+              log.status = 'ERROR';
+              log.error = 'No keys available in buffer';
+              return null;
+            }
+
+            const selectedKey = keyBuffer[0];
+            setKeyBuffer(prev => prev.slice(1));
+            
+            return {
+              keys: [{
+                key_ID: selectedKey.id,
+                key: selectedKey.key
+              }]
+            };
+          };
+
+          const xorEncryptDecrypt = (text, key) => {
+            const textBytes = new TextEncoder().encode(text);
+            const keyBytes = hexToBytes(key);
+            const result = new Uint8Array(textBytes.length);
+            
+            for (let i = 0; i < textBytes.length; i++) {
+              result[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+            }
+            
+            return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
+          };
+
+          const hexToBytes = (hex) => {
+            const bytes = [];
+            for (let i = 0; i < hex.length; i += 2) {
+              bytes.push(parseInt(hex.substr(i, 2), 16));
+            }
+            return bytes;
+          };
+
+          const hexToText = (hex) => {
+            const bytes = hexToBytes(hex);
+            return new TextDecoder().decode(new Uint8Array(bytes));
+          };
+
+          const encryptMessage = async () => {
+            if (!message.trim()) return;
+            
+            setQkdStatus('ENCRYPTING');
+            
+            const keyResponse = await getKeys(1);
+            if (!keyResponse) {
+              setQkdStatus('ERROR');
+              return;
+            }
+            
+            const key = keyResponse.keys[0];
+            const encrypted = xorEncryptDecrypt(message, key.key);
+            
+            setEncryptedMessage(encrypted);
+            setDecryptionKey(key.key);
+            setKeyId(key.key_ID);
+            setQkdStatus('READY');
+          };
+
+          const decryptMessage = () => {
+            if (!encryptedMessage || !decryptionKey) return;
+            
+            setQkdStatus('DECRYPTING');
+            
+            try {
+              const originalBytes = hexToBytes(encryptedMessage);
+              const keyBytes = hexToBytes(decryptionKey);
+              const result = new Uint8Array(originalBytes.length);
+              
+              for (let i = 0; i < originalBytes.length; i++) {
+                result[i] = originalBytes[i] ^ keyBytes[i % keyBytes.length];
+              }
+              
+              setDecryptedMessage(new TextDecoder().decode(result));
+            } catch (error) {
+              setDecryptedMessage('Decryption failed');
+            }
+            
+            setQkdStatus('READY');
+          };
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-8">
+                  <div className="flex items-center justify-center mb-4">
+                    <Zap className="text-blue-400 mr-3" size={32} />
+                    <h1 className="text-4xl font-bold text-white">QKD Key Manager</h1>
+                  </div>
+                  <p className="text-blue-200">ETSI GS QKD 014 REST API Simulator</p>
+                  <div className="flex items-center justify-center mt-2">
+                    <Shield className="text-blue-400 mr-2" size={20} />
+                    <span className={`text-sm font-medium ${
+                      qkdStatus === 'READY' ? 'text-blue-400' : 
+                      qkdStatus === 'ERROR' ? 'text-red-400' : 'text-cyan-400'
+                    }`}>
+                      Status: {qkdStatus}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                        <Send className="mr-2" size={20} />
+                        Message Encryption
+                      </h2>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-blue-200 mb-2">Enter Message:</label>
+                          <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Enter your secret message..."
+                            className="w-full p-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/60 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                            rows="3"
+                          />
+                        </div>
+                        
+                        <button
+                          onClick={encryptMessage}
+                          disabled={!message.trim() || qkdStatus !== 'READY'}
+                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
+                        >
+                          <Lock className="mr-2" size={20} />
+                          Encrypt with QKD Key
+                        </button>
+                      </div>
+                    </div>
+
+                    {encryptedMessage && (
+                      <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                        <h3 className="text-lg font-semibold text-white mb-4">Encrypted Message:</h3>
+                        <div className="bg-slate-900/60 p-4 rounded-lg mb-4 border border-blue-400/20">
+                          <code className="text-blue-300 text-sm break-all font-mono">
+                            {encryptedMessage}
+                          </code>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-blue-200 mb-1">QKD Key ID:</label>
+                            <code className="text-cyan-400 text-sm">{keyId}</code>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-blue-200 mb-1">Decryption Key:</label>
+                            <div className="bg-slate-900/60 p-2 rounded break-all border border-blue-400/20">
+                              <code className="text-blue-300 text-xs font-mono">{decryptionKey}</code>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={decryptMessage}
+                          className="w-full mt-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
+                        >
+                          <Unlock className="mr-2" size={20} />
+                          Decrypt Message
+                        </button>
+
+                        {decryptedMessage && (
+                          <div className="mt-4 p-4 bg-emerald-500/20 border border-emerald-400/30 rounded-lg">
+                            <h4 className="text-emerald-300 font-semibold mb-2">Decrypted Message:</h4>
+                            <p className="text-white">{decryptedMessage}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                        <Key className="mr-2" size={20} />
+                        Quantum Key Buffer
+                      </h2>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="bg-slate-700/50 p-3 rounded-lg text-center border border-blue-300/20">
+                          <div className="text-2xl font-bold text-blue-400">{keyBuffer.length}</div>
+                          <div className="text-blue-200 text-sm">Available Keys</div>
+                        </div>
+                        <div className="bg-slate-700/50 p-3 rounded-lg text-center border border-blue-300/20">
+                          <div className="text-2xl font-bold text-cyan-400">256</div>
+                          <div className="text-blue-200 text-sm">Key Size (bits)</div>
+                        </div>
+                      </div>
+
+                      <div className="max-h-40 overflow-y-auto">
+                        <h4 className="text-blue-200 text-sm mb-2">Recent Keys:</h4>
+                        {keyBuffer.slice(0, 5).map((key, index) => (
+                          <div key={key.id} className="mb-2 p-2 bg-slate-700/50 rounded text-xs border border-blue-300/10">
+                            <div className="text-cyan-300">{key.id}</div>
+                            <div className="text-blue-300/70 truncate font-mono">{key.key.substring(0, 32)}...</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                        <Server className="mr-2" size={20} />
+                        ETSI API Logs
+                      </h2>
+                      
+                      <div className="max-h-80 overflow-y-auto space-y-2">
+                        {apiLogs.map((log, index) => (
+                          <div key={index} className="bg-slate-700/50 p-3 rounded-lg text-xs border border-blue-300/10">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className={`font-semibold ${log.status === 'SUCCESS' ? 'text-emerald-400' : 'text-red-400'}`}>
+                                {log.method}
+                              </span>
+                              <span className="text-blue-200/70">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                            <div className="text-blue-300 mb-1">{log.endpoint}</div>
+                            {log.params && (
+                              <div className="text-blue-200/80">Params: {JSON.stringify(log.params)}</div>
+                            )}
+                            {log.error && (
+                              <div className="text-red-400">Error: {log.error}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                      <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
+                        <Info className="mr-2" size={18} />
+                        QKD Information
+                      </h3>
+                      <div className="text-sm text-blue-200 space-y-2">
+                        <p>• Quantum Key Distribution provides information-theoretic security</p>
+                        <p>• Keys are generated using quantum mechanical properties</p>
+                        <p>• ETSI GS QKD 014 defines REST API interfaces for key management</p>
+                        <p>• This simulator demonstrates the encryption/decryption workflow</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        ReactDOM.render(<QKDKeyManager />, document.getElementById('root'));
+    </script>
+</body>
+</html>
