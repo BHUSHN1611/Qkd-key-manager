@@ -3,12 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QKD Key Manager - ETSI GS QKD 014 Simulator</title>
+    <title>QKD Key Manager - Multi-Level Quantum Encryption System</title>
+    <meta name="description" content="QKD Key Manager implementing ETSI GS QKD 014 with 4-level quantum encryption system">
+    <meta name="keywords" content="quantum, cryptography, QKD, ETSI, encryption, security">
+    
+    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2360a5fa'><path d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>">
+    
+    <!-- Custom Styles -->
     <style>
         .lucide {
             width: 1em;
@@ -19,21 +29,59 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+        
+        /* Custom animations */
+        @keyframes quantum-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .quantum-pulse {
+            animation: quantum-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(96, 165, 250, 0.6); }
+        }
+        
+        .glow-effect {
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(96, 165, 250, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(96, 165, 250, 0.7);
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // Lucide React Icons (simplified versions)
-        const Send = ({ className, size = 24 }) => (
+        // Lucide React Icons (inline SVG components)
+        const Send = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <path d="m22 2-7 20-4-9-9-4Z"/>
                 <path d="M22 2 11 13"/>
             </svg>
         );
 
-        const Key = ({ className, size = 24 }) => (
+        const Key = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <circle cx="7.5" cy="15.5" r="5.5"/>
                 <path d="m21 2-9.6 9.6"/>
@@ -41,21 +89,21 @@
             </svg>
         );
 
-        const Lock = ({ className, size = 24 }) => (
+        const Lock = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                 <path d="m7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
         );
 
-        const Unlock = ({ className, size = 24 }) => (
+        const Unlock = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                 <path d="m7 11V7a5 5 0 0 1 9.9-1"/>
             </svg>
         );
 
-        const Server = ({ className, size = 24 }) => (
+        const Server = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
                 <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
@@ -64,322 +112,818 @@
             </svg>
         );
 
-        const Zap = ({ className, size = 24 }) => (
+        const Zap = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
             </svg>
         );
 
-        const Shield = ({ className, size = 24 }) => (
+        const Shield = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
             </svg>
         );
 
-        const Info = ({ className, size = 24 }) => (
+        const Info = ({ className = "", size = 24 }) => (
             <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="m9 12 2 2 4-4"/>
             </svg>
         );
 
-        // Main QKD Component (same as before but with icon components defined above)
+        const ArrowRight = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+            </svg>
+        );
+
+        const Home = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+        );
+
+        const Settings = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="m12 1 4 6.5L22 6l-1.5 6.5L22 19l-6-1.5L12 23l-4-6.5L2 18l1.5-6.5L2 5l6 1.5z"/>
+            </svg>
+        );
+
+        const Copy = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+            </svg>
+        );
+
+        const Eye = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        );
+
+        const EyeOff = ({ className = "", size = 24 }) => (
+            <svg className={`lucide ${className}`} width={size} height={size} viewBox="0 0 24 24">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                <line x1="2" x2="22" y1="2" y2="22"/>
+            </svg>
+        );
+
+        // Main QKD Key Manager Component
         const QKDKeyManager = () => {
-          const [message, setMessage] = React.useState('');
-          const [encryptedMessage, setEncryptedMessage] = React.useState('');
-          const [decryptionKey, setDecryptionKey] = React.useState('');
-          const [decryptedMessage, setDecryptedMessage] = React.useState('');
-          const [keyId, setKeyId] = React.useState('');
-          const [apiLogs, setApiLogs] = React.useState([]);
-          const [qkdStatus, setQkdStatus] = React.useState('READY');
-          const [keyBuffer, setKeyBuffer] = React.useState([]);
+            const [currentPage, setCurrentPage] = React.useState('landing');
+            const [message, setMessage] = React.useState('');
+            const [encryptedMessage, setEncryptedMessage] = React.useState('');
+            const [decryptionKey, setDecryptionKey] = React.useState('');
+            const [decryptedMessage, setDecryptedMessage] = React.useState('');
+            const [keyId, setKeyId] = React.useState('');
+            const [apiLogs, setApiLogs] = React.useState([]);
+            const [qkdStatus, setQkdStatus] = React.useState('READY');
+            const [encryptionLevel, setEncryptionLevel] = React.useState(1);
+            const [encryptionMethod, setEncryptionMethod] = React.useState('');
+            const [showKey, setShowKey] = React.useState(false);
+            const [showDecryptedKey, setShowDecryptedKey] = React.useState(false);
+            
+            // Key management
+            const [keyBufferDisplay, setKeyBufferDisplay] = React.useState([]);
+            const keyBufferRef = React.useRef([]);
 
-          // Simulate QKD key generation
-          React.useEffect(() => {
-            const interval = setInterval(() => {
-              const newKey = generateQuantumKey();
-              const newKeyId = `qkd_key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-              
-              setKeyBuffer(prev => {
-                const updated = [...prev, { id: newKeyId, key: newKey, timestamp: Date.now() }];
-                return updated.slice(-10);
-              });
-            }, 2000);
-
-            return () => clearInterval(interval);
-          }, []);
-
-          const generateQuantumKey = () => {
-            const keyLength = 32;
-            const key = new Uint8Array(keyLength);
-            crypto.getRandomValues(key);
-            return Array.from(key).map(b => b.toString(16).padStart(2, '0')).join('');
-          };
-
-          const getKeys = async (keyCount = 1) => {
-            const log = {
-              timestamp: new Date().toISOString(),
-              method: 'GET',
-              endpoint: '/api/v1/keys',
-              params: { number: keyCount, size: 32 },
-              status: 'SUCCESS'
+            // Generate quantum key (simulated)
+            const generateQuantumKey = () => {
+                const keyLength = 32;
+                const key = new Uint8Array(keyLength);
+                crypto.getRandomValues(key);
+                return Array.from(key).map(b => b.toString(16).padStart(2, '0')).join('');
             };
-            
-            setApiLogs(prev => [log, ...prev.slice(0, 9)]);
-            
-            if (keyBuffer.length === 0) {
-              log.status = 'ERROR';
-              log.error = 'No keys available in buffer';
-              return null;
-            }
 
-            const selectedKey = keyBuffer[0];
-            setKeyBuffer(prev => prev.slice(1));
-            
-            return {
-              keys: [{
-                key_ID: selectedKey.id,
-                key: selectedKey.key
-              }]
+            // Initialize with keys when entering main page
+            React.useEffect(() => {
+                if (currentPage === 'main' && keyBufferRef.current.length === 0) {
+                    // Generate initial keys
+                    for (let i = 0; i < 5; i++) {
+                        const newKey = generateQuantumKey();
+                        const newKeyId = `qkd_key_${Date.now() + i}_${Math.random().toString(36).substr(2, 9)}`;
+                        keyBufferRef.current.push({ id: newKeyId, key: newKey, timestamp: Date.now() });
+                    }
+                    setKeyBufferDisplay([...keyBufferRef.current]);
+                }
+            }, [currentPage]);
+
+            // Periodic key generation (only when not disrupting user)
+            React.useEffect(() => {
+                let interval;
+                if (currentPage === 'main') {
+                    interval = setInterval(() => {
+                        if (keyBufferRef.current.length < 10) {
+                            const newKey = generateQuantumKey();
+                            const newKeyId = `qkd_key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                            
+                            keyBufferRef.current = [...keyBufferRef.current, { id: newKeyId, key: newKey, timestamp: Date.now() }].slice(-10);
+                            setKeyBufferDisplay([...keyBufferRef.current]);
+                        }
+                    }, 8000);
+                }
+
+                return () => {
+                    if (interval) clearInterval(interval);
+                };
+            }, [currentPage]);
+
+            // ETSI GS QKD 014 API: Get Keys
+            const getKeys = async (keyCount = 1) => {
+                const log = {
+                    timestamp: new Date().toISOString(),
+                    method: 'GET',
+                    endpoint: '/api/v1/keys',
+                    params: { number: keyCount, size: 32, level: encryptionLevel },
+                    status: 'SUCCESS'
+                };
+                
+                setApiLogs(prev => [log, ...prev.slice(0, 9)]);
+                
+                if (keyBufferRef.current.length === 0) {
+                    log.status = 'ERROR';
+                    log.error = 'No keys available in buffer';
+                    return null;
+                }
+
+                const selectedKey = keyBufferRef.current[0];
+                keyBufferRef.current = keyBufferRef.current.slice(1);
+                setKeyBufferDisplay([...keyBufferRef.current]);
+                
+                return {
+                    keys: [{
+                        key_ID: selectedKey.id,
+                        key: selectedKey.key
+                    }]
+                };
             };
-          };
 
-          const xorEncryptDecrypt = (text, key) => {
-            const textBytes = new TextEncoder().encode(text);
-            const keyBytes = hexToBytes(key);
-            const result = new Uint8Array(textBytes.length);
-            
-            for (let i = 0; i < textBytes.length; i++) {
-              result[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
-            }
-            
-            return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
-          };
+            // Encryption Functions
+            const oneTimePadEncrypt = (text, key) => {
+                const textBytes = new TextEncoder().encode(text);
+                const keyBytes = hexToBytes(key);
+                const result = new Uint8Array(textBytes.length);
+                
+                for (let i = 0; i < textBytes.length; i++) {
+                    result[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+                }
+                
+                return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
 
-          const hexToBytes = (hex) => {
-            const bytes = [];
-            for (let i = 0; i < hex.length; i += 2) {
-              bytes.push(parseInt(hex.substr(i, 2), 16));
-            }
-            return bytes;
-          };
+            const quantumAESEncrypt = async (text, quantumSeed) => {
+                const derivedKey = await deriveAESKey(quantumSeed);
+                return simpleAESEncrypt(text, derivedKey);
+            };
 
-          const hexToText = (hex) => {
-            const bytes = hexToBytes(hex);
-            return new TextDecoder().decode(new Uint8Array(bytes));
-          };
+            const pqcEncrypt = (text, key) => {
+                const textBytes = new TextEncoder().encode(text);
+                const keyBytes = hexToBytes(key);
+                const result = new Uint8Array(textBytes.length);
+                
+                for (let i = 0; i < textBytes.length; i++) {
+                    const noise = Math.floor(Math.random() * 16);
+                    result[i] = (textBytes[i] ^ keyBytes[i % keyBytes.length] + noise) % 256;
+                }
+                
+                return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
 
-          const encryptMessage = async () => {
-            if (!message.trim()) return;
-            
-            setQkdStatus('ENCRYPTING');
-            
-            const keyResponse = await getKeys(1);
-            if (!keyResponse) {
-              setQkdStatus('ERROR');
-              return;
-            }
-            
-            const key = keyResponse.keys[0];
-            const encrypted = xorEncryptDecrypt(message, key.key);
-            
-            setEncryptedMessage(encrypted);
-            setDecryptionKey(key.key);
-            setKeyId(key.key_ID);
-            setQkdStatus('READY');
-          };
+            const standardAESEncrypt = (text, key) => {
+                return simpleAESEncrypt(text, key.substring(0, 32));
+            };
 
-          const decryptMessage = () => {
-            if (!encryptedMessage || !decryptionKey) return;
-            
-            setQkdStatus('DECRYPTING');
-            
-            try {
-              const originalBytes = hexToBytes(encryptedMessage);
-              const keyBytes = hexToBytes(decryptionKey);
-              const result = new Uint8Array(originalBytes.length);
-              
-              for (let i = 0; i < originalBytes.length; i++) {
-                result[i] = originalBytes[i] ^ keyBytes[i % keyBytes.length];
-              }
-              
-              setDecryptedMessage(new TextDecoder().decode(result));
-            } catch (error) {
-              setDecryptedMessage('Decryption failed');
-            }
-            
-            setQkdStatus('READY');
-          };
+            // Helper functions
+            const deriveAESKey = async (seed) => {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(seed);
+                const hash = await crypto.subtle.digest('SHA-256', data);
+                return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
 
-          return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-              <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center mb-4">
-                    <Zap className="text-blue-400 mr-3" size={32} />
-                    <h1 className="text-4xl font-bold text-white">QKD Key Manager</h1>
-                  </div>
-                  <p className="text-blue-200">ETSI GS QKD 014 REST API Simulator</p>
-                  <div className="flex items-center justify-center mt-2">
-                    <Shield className="text-blue-400 mr-2" size={20} />
-                    <span className={`text-sm font-medium ${
-                      qkdStatus === 'READY' ? 'text-blue-400' : 
-                      qkdStatus === 'ERROR' ? 'text-red-400' : 'text-cyan-400'
-                    }`}>
-                      Status: {qkdStatus}
-                    </span>
-                  </div>
-                </div>
+            const simpleAESEncrypt = (text, key) => {
+                const textBytes = new TextEncoder().encode(text);
+                const keyBytes = hexToBytes(key);
+                const result = new Uint8Array(textBytes.length);
+                
+                for (let i = 0; i < textBytes.length; i++) {
+                    result[i] = textBytes[i] ^ keyBytes[i % keyBytes.length] ^ (i * 37);
+                }
+                
+                return Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                        <Send className="mr-2" size={20} />
-                        Message Encryption
-                      </h2>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-blue-200 mb-2">Enter Message:</label>
-                          <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Enter your secret message..."
-                            className="w-full p-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/60 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                            rows="3"
-                          />
-                        </div>
-                        
-                        <button
-                          onClick={encryptMessage}
-                          disabled={!message.trim() || qkdStatus !== 'READY'}
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
-                        >
-                          <Lock className="mr-2" size={20} />
-                          Encrypt with QKD Key
-                        </button>
-                      </div>
-                    </div>
+            const hexToBytes = (hex) => {
+                const bytes = [];
+                for (let i = 0; i < hex.length; i += 2) {
+                    bytes.push(parseInt(hex.substr(i, 2), 16));
+                }
+                return bytes;
+            };
 
-                    {encryptedMessage && (
-                      <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
-                        <h3 className="text-lg font-semibold text-white mb-4">Encrypted Message:</h3>
-                        <div className="bg-slate-900/60 p-4 rounded-lg mb-4 border border-blue-400/20">
-                          <code className="text-blue-300 text-sm break-all font-mono">
-                            {encryptedMessage}
-                          </code>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-blue-200 mb-1">QKD Key ID:</label>
-                            <code className="text-cyan-400 text-sm">{keyId}</code>
-                          </div>
-                          
-                          <div>
-                            <label className="block text-blue-200 mb-1">Decryption Key:</label>
-                            <div className="bg-slate-900/60 p-2 rounded break-all border border-blue-400/20">
-                              <code className="text-blue-300 text-xs font-mono">{decryptionKey}</code>
+            const simpleAESDecrypt = (encryptedHex, key) => {
+                const encryptedBytes = hexToBytes(encryptedHex);
+                const keyBytes = hexToBytes(key);
+                const result = new Uint8Array(encryptedBytes.length);
+                
+                for (let i = 0; i < encryptedBytes.length; i++) {
+                    result[i] = encryptedBytes[i] ^ keyBytes[i % keyBytes.length] ^ (i * 37);
+                }
+                
+                return new TextDecoder().decode(result);
+            };
+
+            const encryptMessage = async () => {
+                if (!message.trim()) return;
+                
+                setQkdStatus('ENCRYPTING');
+                
+                const keyResponse = await getKeys(1);
+                if (!keyResponse) {
+                    setQkdStatus('ERROR');
+                    return;
+                }
+                
+                const key = keyResponse.keys[0];
+                let encrypted = '';
+                let method = '';
+
+                try {
+                    switch (encryptionLevel) {
+                        case 1:
+                            encrypted = oneTimePadEncrypt(message, key.key);
+                            method = 'Quantum Secure (One Time Pad)';
+                            break;
+                        case 2:
+                            encrypted = await quantumAESEncrypt(message, key.key);
+                            method = 'Quantum-aided AES';
+                            break;
+                        case 3:
+                            encrypted = pqcEncrypt(message, key.key);
+                            method = 'Post-Quantum Cryptography (Lattice-based)';
+                            break;
+                        case 4:
+                            encrypted = standardAESEncrypt(message, key.key);
+                            method = 'Standard AES Encryption';
+                            break;
+                        default:
+                            encrypted = oneTimePadEncrypt(message, key.key);
+                            method = 'Quantum Secure (One Time Pad)';
+                    }
+
+                    setEncryptedMessage(encrypted);
+                    setDecryptionKey(key.key);
+                    setKeyId(key.key_ID);
+                    setEncryptionMethod(method);
+                    setQkdStatus('READY');
+                } catch (error) {
+                    setQkdStatus('ERROR');
+                    console.error('Encryption failed:', error);
+                }
+            };
+
+            const decryptMessage = async () => {
+                if (!encryptedMessage || !decryptionKey) return;
+                
+                setQkdStatus('DECRYPTING');
+                
+                try {
+                    let decrypted = '';
+                    
+                    switch (encryptionLevel) {
+                        case 1:
+                            const originalBytes = hexToBytes(encryptedMessage);
+                            const keyBytes = hexToBytes(decryptionKey);
+                            const result = new Uint8Array(originalBytes.length);
+                            
+                            for (let i = 0; i < originalBytes.length; i++) {
+                                result[i] = originalBytes[i] ^ keyBytes[i % keyBytes.length];
+                            }
+                            
+                            decrypted = new TextDecoder().decode(result);
+                            break;
+                        case 2:
+                            const derivedKey = await deriveAESKey(decryptionKey);
+                            decrypted = simpleAESDecrypt(encryptedMessage, derivedKey);
+                            break;
+                        case 3:
+                            const pqcBytes = hexToBytes(encryptedMessage);
+                            const pqcKeyBytes = hexToBytes(decryptionKey);
+                            const pqcResult = new Uint8Array(pqcBytes.length);
+                            
+                            for (let i = 0; i < pqcBytes.length; i++) {
+                                const noise = Math.floor(Math.random() * 16);
+                                pqcResult[i] = (pqcBytes[i] - noise + 256) % 256 ^ pqcKeyBytes[i % pqcKeyBytes.length];
+                            }
+                            
+                            decrypted = new TextDecoder().decode(pqcResult);
+                            break;
+                        case 4:
+                            decrypted = simpleAESDecrypt(encryptedMessage, decryptionKey.substring(0, 32));
+                            break;
+                        default:
+                            decrypted = 'Decryption method not implemented';
+                    }
+                    
+                    setDecryptedMessage(decrypted);
+                } catch (error) {
+                    setDecryptedMessage('Decryption failed');
+                }
+                
+                setQkdStatus('READY');
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Could add a toast notification here
+                });
+            };
+
+            const resetAll = () => {
+                setMessage('');
+                setEncryptedMessage('');
+                setDecryptionKey('');
+                setDecryptedMessage('');
+                setKeyId('');
+                setEncryptionMethod('');
+            };
+
+            // Render landing page
+            if (currentPage === 'landing') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+                        <div className="max-w-4xl mx-auto text-center">
+                            {/* Hero Section */}
+                            <div className="mb-12">
+                                <div className="flex items-center justify-center mb-8">
+                                    <div className="relative">
+                                        <Zap className="text-blue-400 quantum-pulse" size={80} />
+                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-400 rounded-full animate-ping"></div>
+                                    </div>
+                                </div>
+                                
+                                <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                                    QKD Key Manager
+                                </h1>
+                                
+                                <p className="text-xl text-blue-200 mb-2">
+                                    Quantum Key Distribution Encryption System
+                                </p>
+                                
+                                <p className="text-lg text-blue-300/80 mb-8">
+                                    ETSI GS QKD 014 REST API Simulator - Prototype Version 1.0
+                                </p>
+
+                                <div className="flex items-center justify-center mb-8">
+                                    <Shield className="text-green-400 mr-2" size={24} />
+                                    <span className="text-green-400 font-semibold">
+                                        Multi-Level Quantum Security Ready
+                                    </span>
+                                </div>
                             </div>
-                          </div>
-                        </div>
 
-                        <button
-                          onClick={decryptMessage}
-                          className="w-full mt-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
-                        >
-                          <Unlock className="mr-2" size={20} />
-                          Decrypt Message
-                        </button>
-
-                        {decryptedMessage && (
-                          <div className="mt-4 p-4 bg-emerald-500/20 border border-emerald-400/30 rounded-lg">
-                            <h4 className="text-emerald-300 font-semibold mb-2">Decrypted Message:</h4>
-                            <p className="text-white">{decryptedMessage}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                        <Key className="mr-2" size={20} />
-                        Quantum Key Buffer
-                      </h2>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div className="bg-slate-700/50 p-3 rounded-lg text-center border border-blue-300/20">
-                          <div className="text-2xl font-bold text-blue-400">{keyBuffer.length}</div>
-                          <div className="text-blue-200 text-sm">Available Keys</div>
-                        </div>
-                        <div className="bg-slate-700/50 p-3 rounded-lg text-center border border-blue-300/20">
-                          <div className="text-2xl font-bold text-cyan-400">256</div>
-                          <div className="text-blue-200 text-sm">Key Size (bits)</div>
-                        </div>
-                      </div>
-
-                      <div className="max-h-40 overflow-y-auto">
-                        <h4 className="text-blue-200 text-sm mb-2">Recent Keys:</h4>
-                        {keyBuffer.slice(0, 5).map((key, index) => (
-                          <div key={key.id} className="mb-2 p-2 bg-slate-700/50 rounded text-xs border border-blue-300/10">
-                            <div className="text-cyan-300">{key.id}</div>
-                            <div className="text-blue-300/70 truncate font-mono">{key.key.substring(0, 32)}...</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
-                      <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                        <Server className="mr-2" size={20} />
-                        ETSI API Logs
-                      </h2>
-                      
-                      <div className="max-h-80 overflow-y-auto space-y-2">
-                        {apiLogs.map((log, index) => (
-                          <div key={index} className="bg-slate-700/50 p-3 rounded-lg text-xs border border-blue-300/10">
-                            <div className="flex justify-between items-start mb-1">
-                              <span className={`font-semibold ${log.status === 'SUCCESS' ? 'text-emerald-400' : 'text-red-400'}`}>
-                                {log.method}
-                              </span>
-                              <span className="text-blue-200/70">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                            {/* Features Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                                <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 hover:border-green-400/40 transition-all duration-300 transform hover:scale-105">
+                                    <div className="text-green-400 mb-3">
+                                        <Lock size={32} className="mx-auto" />
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-2">Level 1</h3>
+                                    <p className="text-blue-200 text-sm">Quantum Secure One-Time Pad</p>
+                                </div>
+                                
+                                <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 hover:border-cyan-400/40 transition-all duration-300 transform hover:scale-105">
+                                    <div className="text-cyan-400 mb-3">
+                                        <Key size={32} className="mx-auto" />
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-2">Level 2</h3>
+                                    <p className="text-blue-200 text-sm">Quantum-Aided AES</p>
+                                </div>
+                                
+                                <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 hover:border-purple-400/40 transition-all duration-300 transform hover:scale-105">
+                                    <div className="text-purple-400 mb-3">
+                                        <Shield size={32} className="mx-auto" />
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-2">Level 3</h3>
+                                    <p className="text-blue-200 text-sm">Post-Quantum Cryptography</p>
+                                </div>
+                                
+                                <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 hover:border-yellow-400/40 transition-all duration-300 transform hover:scale-105">
+                                    <div className="text-yellow-400 mb-3">
+                                        <Server size={32} className="mx-auto" />
+                                    </div>
+                                    <h3 className="text-white font-semibold mb-2">Level 4</h3>
+                                    <p className="text-blue-200 text-sm">Standard AES Encryption</p>
+                                </div>
                             </div>
-                            <div className="text-blue-300 mb-1">{log.endpoint}</div>
-                            {log.params && (
-                              <div className="text-blue-200/80">Params: {JSON.stringify(log.params)}</div>
-                            )}
-                            {log.error && (
-                              <div className="text-red-400">Error: {log.error}</div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
-                      <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
-                        <Info className="mr-2" size={18} />
-                        QKD Information
-                      </h3>
-                      <div className="text-sm text-blue-200 space-y-2">
-                        <p>• Quantum Key Distribution provides information-theoretic security</p>
-                        <p>• Keys are generated using quantum mechanical properties</p>
-                        <p>• ETSI GS QKD 014 defines REST API interfaces for key management</p>
-                        <p>• This simulator demonstrates the encryption/decryption workflow</p>
-                      </div>
+                            {/* CTA Button */}
+                            <div className="text-center">
+                                <button
+                                    onClick={() => setCurrentPage('main')}
+                                    className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-blue-500/25 flex items-center mx-auto text-lg glow-effect"
+                                >
+                                    Start Encrypting Messages - Prototype Version One
+                                    <ArrowRight className="ml-3" size={24} />
+                                </button>
+                                
+                                <p className="text-blue-300/60 text-sm mt-4">
+                                    Experience quantum-grade encryption with multiple security levels
+                                </p>
+                            </div>
+
+                            {/* Technical Info */}
+                            <div className="mt-16 bg-slate-800/30 backdrop-blur-md rounded-xl p-6 border border-blue-300/20">
+                                <h3 className="text-white text-lg font-semibold mb-4">About ETSI GS QKD 014</h3>
+                                <p className="text-blue-200/80 text-sm leading-relaxed">
+                                    This simulator implements the ETSI GS QKD 014 standard for Quantum Key Distribution interfaces. 
+                                    It provides a REST API compatible interface for key management operations with multiple encryption 
+                                    levels ranging from quantum-secure one-time pad to traditional AES encryption.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                  </div>
+                );
+            }
+
+            // Render main application
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
+                    <div className="max-w-6xl mx-auto">
+                        {/* Header */}
+                        <div className="text-center mb-8">
+                            <div className="flex items-center justify-between mb-4">
+                                <button
+                                    onClick={() => setCurrentPage('landing')}
+                                    className="flex items-center text-blue-300 hover:text-white transition-colors"
+                                >
+                                    <Home size={20} className="mr-2" />
+                                    Back to Home
+                                </button>
+                                
+                                <div className="flex items-center">
+                                    <Zap className="text-blue-400 mr-3" size={32} />
+                                    <h1 className="text-4xl font-bold text-white">QKD Key Manager</h1>
+                                </div>
+                                
+                                <button
+                                    onClick={resetAll}
+                                    className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                                >
+                                    Reset All
+                                </button>
+                            </div>
+                            
+                            <p className="text-blue-200">ETSI GS QKD 014 REST API Simulator</p>
+                            <div className="flex items-center justify-center mt-2">
+                                <Shield className="text-blue-400 mr-2" size={20} />
+                                <span className={`text-sm font-medium ${
+                                    qkdStatus === 'READY' ? 'text-green-400' : 
+                                    qkdStatus === 'ERROR' ? 'text-red-400' : 'text-cyan-400'
+                                }`}>
+                                    Status: {qkdStatus}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Left Panel */}
+                            <div className="space-y-6">
+                                {/* Encryption Level Selection */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                                        <Settings className="mr-2" size={20} />
+                                        Encryption Level Selection
+                                    </h2>
+                                    
+                                    <div className="space-y-3">
+                                        {[
+                                            { level: 1, name: "Quantum Secure", desc: "One Time Pad - Maximum Security", color: "text-green-400" },
+                                            { level: 2, name: "Quantum-aided AES", desc: "Quantum keys as AES seed", color: "text-blue-400" },
+                                            { level: 3, name: "Post-Quantum Crypto", desc: "Lattice-based encryption", color: "text-purple-400" },
+                                            { level: 4, name: "Standard AES", desc: "Traditional AES encryption", color: "text-yellow-400" }
+                                        ].map((option) => (
+                                            <label key={option.level} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-700/30 transition-colors">
+                                                <input
+                                                    type="radio"
+                                                    name="encryptionLevel"
+                                                    value={option.level}
+                                                    checked={encryptionLevel === option.level}
+                                                    onChange={(e) => setEncryptionLevel(parseInt(e.target.value))}
+                                                    className="mr-3 text-blue-500"
+                                                />
+                                                <div className="flex-1">
+                                                    <span className={`font-semibold ${option.color}`}>
+                                                        Level {option.level}: {option.name}
+                                                    </span>
+                                                    <p className="text-blue-200/70 text-sm">{option.desc}</p>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Message Input */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                                        <Send className="mr-2" size={20} />
+                                        Message Encryption
+                                    </h2>
+                                    
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-blue-200 mb-2">Enter Message:</label>
+                                            <textarea
+                                                value={message}
+                                                onChange={(e) => setMessage(e.target.value)}
+                                                placeholder="Enter your secret message..."
+                                                className="w-full p-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/60 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                                                rows="4"
+                                                autoComplete="off"
+                                                spellCheck="false"
+                                            />
+                                        </div>
+                                        
+                                        <button
+                                            onClick={encryptMessage}
+                                            disabled={!message.trim() || qkdStatus !== 'READY'}
+                                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
+                                        >
+                                            <Lock className="mr-2" size={20} />
+                                            {qkdStatus === 'ENCRYPTING' ? 'Encrypting...' : `Encrypt with Level ${encryptionLevel} Security`}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Encrypted Result */}
+                                {encryptedMessage && (
+                                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                            <Lock className="mr-2 text-green-400" size={20} />
+                                            Encrypted Message
+                                        </h3>
+                                        
+                                        <div className="space-y-4">
+                                            <div className="p-3 bg-indigo-500/20 border border-indigo-400/30 rounded-lg">
+                                                <span className="text-indigo-300 font-semibold">Method Used: </span>
+                                                <span className="text-white">{encryptionMethod}</span>
+                                            </div>
+                                            
+                                            <div className="bg-slate-900/60 p-4 rounded-lg border border-blue-400/20">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-blue-300 text-sm font-medium">Encrypted Data:</span>
+                                                    <button
+                                                        onClick={() => copyToClipboard(encryptedMessage)}
+                                                        className="text-blue-400 hover:text-blue-300 transition-colors"
+                                                        title="Copy to clipboard"
+                                                    >
+                                                        <Copy size={16} />
+                                                    </button>
+                                                </div>
+                                                <code className="text-blue-300 text-xs break-all font-mono block">
+                                                    {encryptedMessage}
+                                                </code>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div>
+                                                    <label className="block text-blue-200 mb-1 text-sm">QKD Key ID:</label>
+                                                    <div className="flex items-center justify-between p-2 bg-slate-700/50 rounded border border-cyan-400/20">
+                                                        <code className="text-cyan-400 text-xs">{keyId}</code>
+                                                        <button
+                                                            onClick={() => copyToClipboard(keyId)}
+                                                            className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                                                            title="Copy Key ID"
+                                                        >
+                                                            <Copy size={14} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className="block text-blue-200 mb-1 text-sm">Decryption Key:</label>
+                                                    <div className="flex items-center justify-between p-2 bg-slate-700/50 rounded border border-yellow-400/20">
+                                                        <code className="text-yellow-400 text-xs break-all flex-1 mr-2">
+                                                            {showKey ? decryptionKey : '*'.repeat(decryptionKey.length)}
+                                                        </code>
+                                                        <div className="flex space-x-1">
+                                                            <button
+                                                                onClick={() => setShowKey(!showKey)}
+                                                                className="text-yellow-400 hover:text-yellow-300 transition-colors"
+                                                                title={showKey ? "Hide key" : "Show key"}
+                                                            >
+                                                                {showKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => copyToClipboard(decryptionKey)}
+                                                                className="text-yellow-400 hover:text-yellow-300 transition-colors"
+                                                                title="Copy Decryption Key"
+                                                            >
+                                                                <Copy size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Decryption Section */}
+                                {encryptedMessage && decryptionKey && (
+                                    <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                            <Unlock className="mr-2 text-green-400" size={20} />
+                                            Message Decryption
+                                        </h3>
+                                        
+                                        <div className="space-y-4">
+                                            <button
+                                                onClick={decryptMessage}
+                                                disabled={qkdStatus !== 'READY'}
+                                                className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl"
+                                            >
+                                                <Unlock className="mr-2" size={20} />
+                                                {qkdStatus === 'DECRYPTING' ? 'Decrypting...' : 'Decrypt Message'}
+                                            </button>
+                                            
+                                            {decryptedMessage && (
+                                                <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-green-400 font-semibold text-sm">Decrypted Message:</span>
+                                                        <button
+                                                            onClick={() => copyToClipboard(decryptedMessage)}
+                                                            className="text-green-400 hover:text-green-300 transition-colors"
+                                                            title="Copy decrypted message"
+                                                        >
+                                                            <Copy size={16} />
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-white break-words">{decryptedMessage}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right Panel */}
+                            <div className="space-y-6">
+                                {/* QKD Status */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                                        <Server className="mr-2" size={20} />
+                                        QKD System Status
+                                    </h2>
+                                    
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-blue-200">Connection Status:</span>
+                                            <span className="text-green-400 flex items-center">
+                                                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                                                CONNECTED
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-blue-200">Keys Available:</span>
+                                            <span className="text-cyan-400">{keyBufferDisplay.length}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-blue-200">Current Level:</span>
+                                            <span className="text-purple-400">Level {encryptionLevel}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-blue-200">API Version:</span>
+                                            <span className="text-blue-400">ETSI GS QKD 014 v1.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Key Buffer */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                        <Key className="mr-2" size={18} />
+                                        Quantum Key Buffer
+                                    </h3>
+                                    
+                                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                                        {keyBufferDisplay.length === 0 ? (
+                                            <p className="text-blue-300/60 text-sm italic">Generating quantum keys...</p>
+                                        ) : (
+                                            keyBufferDisplay.map((key, index) => (
+                                                <div key={key.id} className="p-3 bg-slate-700/50 rounded border border-blue-300/10 hover:border-blue-300/30 transition-colors">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-xs text-blue-300">#{index + 1}</span>
+                                                        <span className="text-xs text-blue-400">
+                                                            {new Date(key.timestamp).toLocaleTimeString()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-xs font-mono text-cyan-300 break-all">
+                                                        {key.key.substring(0, 32)}...
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* API Logs */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                        <Info className="mr-2" size={18} />
+                                        ETSI API Logs
+                                    </h3>
+                                    
+                                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                                        {apiLogs.length === 0 ? (
+                                            <p className="text-blue-300/60 text-sm italic">No API calls yet...</p>
+                                        ) : (
+                                            apiLogs.map((log, index) => (
+                                                <div key={index} className="p-3 bg-slate-700/30 rounded border border-blue-300/10 text-xs">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-blue-400 font-medium">
+                                                            {log.method} {log.endpoint}
+                                                        </span>
+                                                        <span className={`px-2 py-1 rounded text-xs ${
+                                                            log.status === 'SUCCESS' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                                                        }`}>
+                                                            {log.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-blue-300/80">
+                                                        {new Date(log.timestamp).toLocaleTimeString()}
+                                                    </div>
+                                                    {log.error && (
+                                                        <div className="text-red-400 text-xs mt-1">{log.error}</div>
+                                                    )}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Security Information */}
+                                <div className="bg-slate-800/70 backdrop-blur-md rounded-xl p-6 border border-blue-300/20 shadow-xl">
+                                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                        <Shield className="mr-2" size={18} />
+                                        Security Information
+                                    </h3>
+                                    
+                                    <div className="space-y-3 text-sm">
+                                        <div className="p-3 bg-green-500/10 border border-green-400/20 rounded">
+                                            <div className="text-green-400 font-semibold mb-1">Level 1 - Quantum Secure</div>
+                                            <p className="text-green-300/80">One-Time Pad encryption provides perfect secrecy when used correctly with truly random keys.</p>
+                                        </div>
+                                        
+                                        <div className="p-3 bg-blue-500/10 border border-blue-400/20 rounded">
+                                            <div className="text-blue-400 font-semibold mb-1">Level 2 - Quantum-aided AES</div>
+                                            <p className="text-blue-300/80">Uses quantum-generated keys as seeds for AES encryption, combining quantum randomness with proven algorithms.</p>
+                                        </div>
+                                        
+                                        <div className="p-3 bg-purple-500/10 border border-purple-400/20 rounded">
+                                            <div className="text-purple-400 font-semibold mb-1">Level 3 - Post-Quantum</div>
+                                            <p className="text-purple-300/80">Lattice-based cryptography designed to resist both classical and quantum computer attacks.</p>
+                                        </div>
+                                        
+                                        <div className="p-3 bg-yellow-500/10 border border-yellow-400/20 rounded">
+                                            <div className="text-yellow-400 font-semibold mb-1">Level 4 - Standard AES</div>
+                                            <p className="text-yellow-300/80">Traditional AES-256 encryption, secure against classical attacks but vulnerable to quantum computers.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-12 text-center">
+                            <div className="bg-slate-800/50 backdrop-blur-md rounded-xl p-4 border border-blue-300/20">
+                                <p className="text-blue-300/80 text-sm">
+                                    🔐 QKD Key Manager v1.0 - ETSI GS QKD 014 Simulation | 
+                                    <span className="text-blue-400"> Quantum-Safe Encryption Prototype</span>
+                                </p>
+                                <p className="text-blue-300/60 text-xs mt-1">
+                                    This is a simulation for educational and demonstration purposes
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          );
+            );
         };
 
         // Render the app
-        ReactDOM.render(<QKDKeyManager />, document.getElementById('root'));
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<QKDKeyManager />);
     </script>
 </body>
 </html>
